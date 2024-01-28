@@ -1,6 +1,6 @@
 const express = require("express");
 const mysql = require("mysql2");
-
+const inquirer = require("inquirer");
 const PORT = process.env.PORT || 3001;
 const app = express();
 
@@ -16,6 +16,11 @@ const db = mysql.createConnection(
   },
   console.log(`Connected to the business_db database.`)
 );
+
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
+  startApp();
+});
 
 function startApp() {
   inquirer
@@ -76,6 +81,15 @@ function viewAllDepartments() {
   });
 }
 
+function viewAllEmployees() {
+  const query = "SELECT * FROM employee";
+  db.query(query, (err, res)=>{
+    if (err) throw err;
+    console.table(res)
+    startApp()
+  })
+}
+
 function viewAllRoles() {
   const query = "SELECT * FROM role";
   db.query(query, (err, res) => {
@@ -90,11 +104,11 @@ function viewAllRoles() {
 function addDepartment() {
   inquirer
     .prompt({
-      name: "department_name",
+      name: "name",
       message: "Enter the department name:",
     })
     .then((answer) => {
-      const query = "INSERT INTO departments SET ?";
+      const query = "INSERT INTO department SET ?";
       db.query(query, answer, (err, res) => {
         if (err) throw err;
 
@@ -109,16 +123,20 @@ function addRole() {
   inquirer
     .prompt([
       {
-        name: "role_title",
+        name: "title",
         message: "Enter the role title:",
       },
       {
         name: "salary",
         message: "Enter the salary:",
       },
+      {
+        name:  "department_id",
+        message: "Enter department ID",
+      },
     ])
     .then((answers) => {
-      const query = "INSERT INTO roles SET ?";
+      const query = "INSERT INTO role SET ?";
       db.query(query, answers, (err, res) => {
         if (err) throw err;
 
@@ -129,11 +147,43 @@ function addRole() {
     });
 }
 
+function addEmployee() {
+  inquirer
+      .prompt([
+        {
+          name: "first_name",
+          message: "Enter first name",
+        },
+        {
+          name: "last_name",
+          message: "Enter last name",
+        },
+        {
+          name: "role_id",
+          message: "Enter role ID",
+        },
+        {
+          name: "manager_id",
+          message: "Enter manager ID",
+        },
+      ])
+      .then((answers) => {
+        const query = "INSERT INTO employee SET ?";
+        db.query(query, answers, (err, res) => {
+          if (err) throw err;
+  
+          console.log("Employee added successfully!");
+  
+          startApp();
+        });
+      });
+}
+
 function updateEmployeeRole() {
   inquirer
     .prompt([
       {
-        name: "employee_id",
+        name: "id",
         message: "Enter the employee ID to update:",
       },
       {
@@ -143,7 +193,7 @@ function updateEmployeeRole() {
     ])
     .then((answers) => {
       const query = "UPDATE employee SET role_id = ? WHERE id = ?";
-      db.query(query, [answers.role_id, answers.employee_id], (err, res) => {
+      db.query(query, [answers.role_id, answers.id], (err, res) => {
         if (err) throw err;
 
         console.log("Employee role updated successfully!");
