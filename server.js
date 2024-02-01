@@ -130,10 +130,7 @@ function addRole() {
         name: "salary",
         message: "Enter the salary:",
       },
-      {
-        name:  "department_id",
-        message: "Enter department ID",
-      },
+      
     ])
     .then((answers) => {
       const query = "INSERT INTO role SET ?";
@@ -158,10 +155,7 @@ function addEmployee() {
           name: "last_name",
           message: "Enter last name",
         },
-        {
-          name: "role_id",
-          message: "Enter role ID",
-        },
+        
         {
           name: "manager_id",
           message: "Enter manager ID",
@@ -186,10 +180,7 @@ function updateEmployeeRole() {
         name: "id",
         message: "Enter the employee ID to update:",
       },
-      {
-        name: "role_id",
-        message: "Enter the new role ID:",
-      },
+      
     ])
     .then((answers) => {
       const query = "UPDATE employee SET role_id = ? WHERE id = ?";
